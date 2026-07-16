@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author: Junxiao Song
+@author: Bingnan Ma
 """
 
 from __future__ import print_function
@@ -23,7 +23,7 @@ class Board(object):
 
     def init_board(self, start_player=0):
         if self.width < self.n_in_row or self.height < self.n_in_row:
-            raise Exception('board width and height can not be '
+            raise ValueError('board width and height can not be '
                             'less than {}'.format(self.n_in_row))
         self.current_player = self.players[start_player]  # start player
         # keep available moves in a list
@@ -58,18 +58,21 @@ class Board(object):
         state shape: 4*width*height
         """
 
-        square_state = np.zeros((4, self.width, self.height))
+        # Tensor layout follows the common NCHW convention: channels, rows,
+        # columns. The original implementation accidentally swapped width and
+        # height, which only went unnoticed because its bundled boards are square.
+        square_state = np.zeros((4, self.height, self.width), dtype=np.float32)
         if self.states:
             moves, players = np.array(list(zip(*self.states.items())))
             move_curr = moves[players == self.current_player]
             move_oppo = moves[players != self.current_player]
             square_state[0][move_curr // self.width,
-                            move_curr % self.height] = 1.0
+                            move_curr % self.width] = 1.0
             square_state[1][move_oppo // self.width,
-                            move_oppo % self.height] = 1.0
+                            move_oppo % self.width] = 1.0
             # indicate the last move location
             square_state[2][self.last_move // self.width,
-                            self.last_move % self.height] = 1.0
+                            self.last_move % self.width] = 1.0
         if len(self.states) % 2 == 0:
             square_state[3][:, :] = 1.0  # indicate the colour to play
         return square_state[:, ::-1, :]

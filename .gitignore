@@ -1,2 +1,12 @@
 *.pyc
 __pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+models/current_policy.model
+models/best_policy.model
