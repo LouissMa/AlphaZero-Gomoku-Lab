@@ -1,0 +1,36 @@
+[board]
+width = 6
+height = 6
+n_in_row = 4
+
+[network]
+channels = 64
+residual_blocks = 4
+policy_channels = 2
+value_channels = 1
+value_hidden_size = 128
+device = "auto"
+amp = true
+compile_model = false
+
+[self_play]
+games_per_iteration = 1
+simulations_per_move = 400
+c_puct = 5.0
+temperature = 1.0
+
+[optimization]
+learning_rate = 0.002
+weight_decay = 0.0001
+batch_size = 512
+epochs_per_iteration = 5
+replay_capacity = 10000
+gradient_clip_norm = 5.0
+
+[run]
+name = "gomoku-6x6-baseline"
+seed = 2026
+deterministic = false
+iterations = 1500
+checkpoint_every = 50
+output_dir = "runs"
