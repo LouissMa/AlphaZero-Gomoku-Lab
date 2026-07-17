@@ -6,7 +6,9 @@ import argparse
 import importlib.util
 import platform
 from collections.abc import Sequence
+from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -27,6 +29,49 @@ def _doctor(_: argparse.Namespace) -> int:
     return 0
 
 
+def _report_training_iteration(state: Any, metrics: dict[str, Any]) -> None:
+    loss = metrics.get("loss")
+    loss_text = "warming-up" if loss is None else f"loss={loss:.4f}"
+    print(
+        f"iteration={state.iteration} games={state.total_games} "
+        f"positions={state.total_positions} replay={metrics['replay_size']} {loss_text}"
+    )
+
+
+def _train(args: argparse.Namespace) -> int:
+    try:
+        from alphazero_gomoku.training.config import load_experiment_config
+        from alphazero_gomoku.training.trainer import AlphaZeroTrainer
+    except ImportError as error:
+        if error.name == "torch":
+            raise SystemExit(
+                'PyTorch is required for training. Install it with: pip install -e ".[train]"'
+            ) from error
+        raise
+
+    if args.resume is not None:
+        trainer = AlphaZeroTrainer.resume(
+            args.resume,
+            device=args.device or "auto",
+        )
+    else:
+        config = load_experiment_config(args.config)
+        if args.device is not None:
+            config = replace(
+                config,
+                network=replace(config.network, device=args.device),
+            )
+        trainer = AlphaZeroTrainer.create(config)
+
+    state = trainer.run(
+        target_iteration=args.iterations,
+        on_iteration=_report_training_iteration,
+    )
+    checkpoint = trainer.checkpoints.latest()
+    print(f"Training complete at iteration {state.iteration}. Checkpoint: {checkpoint}")
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gomoku",
@@ -40,6 +85,27 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Check the local runtime and bundled model availability.",
     )
     doctor.set_defaults(handler=_doctor)
+
+    train = subparsers.add_parser(
+        "train",
+        help="Run or resume the reproducible AlphaZero training pipeline.",
+    )
+    source = train.add_mutually_exclusive_group(required=True)
+    source.add_argument("--config", type=Path, help="TOML experiment configuration.")
+    source.add_argument("--resume", type=Path, help="Checkpoint directory to resume.")
+    train.add_argument(
+        "--iterations",
+        type=int,
+        default=None,
+        help="Absolute iteration target; defaults to the configured target.",
+    )
+    train.add_argument(
+        "--device",
+        choices=("auto", "cpu", "cuda"),
+        default=None,
+        help="Override the configured device.",
+    )
+    train.set_defaults(handler=_train)
     return parser
 
 

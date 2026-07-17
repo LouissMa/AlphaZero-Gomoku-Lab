@@ -5,12 +5,20 @@ on:
     paths:
       - "alphazero_gomoku/policy_value_net_pytorch.py"
       - "tests/test_policy_value_net_pytorch.py"
+      - "alphazero_gomoku/training/**"
+      - "tests/test_training_*.py"
+      - "configs/*.toml"
+      - "alphazero_gomoku/cli.py"
       - "pyproject.toml"
       - ".github/workflows/pytorch.yml"
   pull_request:
     paths:
       - "alphazero_gomoku/policy_value_net_pytorch.py"
       - "tests/test_policy_value_net_pytorch.py"
+      - "alphazero_gomoku/training/**"
+      - "tests/test_training_*.py"
+      - "configs/*.toml"
+      - "alphazero_gomoku/cli.py"
       - "pyproject.toml"
       - ".github/workflows/pytorch.yml"
 
@@ -36,7 +44,7 @@ jobs:
         run: python -m pip install --upgrade pip ".[dev,train]"
 
       - name: Check modern backend
-        run: ruff check alphazero_gomoku/policy_value_net_pytorch.py tests/test_policy_value_net_pytorch.py
+        run: ruff check alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/cli.py tests
 
       - name: Test modern backend
-        run: python -m pytest tests/test_policy_value_net_pytorch.py
+        run: python -m pytest tests/test_policy_value_net_pytorch.py tests/test_training_checkpoint.py tests/test_training_pipeline.py

@@ -14,6 +14,8 @@ preserving the bundled NumPy inference path and pretrained models.
 - Modern PyTorch residual policy-value network.
 - AdamW training, gradient clipping, CUDA AMP, and optional `torch.compile`.
 - Versioned, portable checkpoints containing complete architecture metadata.
+- Reproducible self-play training with persistent replay, JSONL metrics, and
+  interruption-safe resume.
 - Pure MCTS baseline player.
 - Terminal and Pygame human-versus-AI interfaces.
 - NumPy inference with bundled 6x6/4-in-a-row and 8x8/5-in-a-row models.
@@ -60,6 +62,23 @@ network = PolicyValueNet(6, 6, config=config, device="auto")
 See the [PyTorch backend guide](docs/PYTORCH_BACKEND.md) for training and
 checkpoint examples.
 
+## Reproducible training
+
+Run a small end-to-end smoke experiment:
+
+```bash
+python -m alphazero_gomoku train --config configs/train_smoke.toml
+```
+
+Start the full experiment or resume an exact snapshot:
+
+```bash
+gomoku train --config configs/train_6x6.toml
+gomoku train --resume runs/gomoku-6x6-baseline/checkpoints/step_000050
+```
+
+See the [training guide](docs/TRAINING.md) for outputs and reproducibility details.
+
 ## Development
 
 ```bash
@@ -74,7 +93,7 @@ See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 
 - [x] Modern engineering baseline.
 - [x] Modern PyTorch residual policy-value network.
-- [ ] Reproducible training pipeline.
+- [x] Reproducible training pipeline.
 - [ ] Batched inference and parallel self-play.
 - [ ] Elo evaluation arena.
 - [ ] Gumbel AlphaZero.
