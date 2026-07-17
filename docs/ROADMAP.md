@@ -29,8 +29,11 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 4. Scalable self-play and MCTS
 
+**Status: complete.**
+
 - Batched neural inference, parallel actors, search-tree reuse, and profiling.
 - Publish simulations-per-second and hardware utilization benchmarks.
+- Deterministic actor-local RNG streams and versioned JSON benchmark reports.
 
 ## 5. Evaluation arena
 

@@ -14,10 +14,13 @@ amp = false
 compile_model = false
 
 [self_play]
-games_per_iteration = 1
+games_per_iteration = 2
 simulations_per_move = 2
 c_puct = 1.5
 temperature = 1.0
+parallel_games = 2
+inference_batch_size = 4
+inference_wait_ms = 10.0
 
 [optimization]
 learning_rate = 0.001

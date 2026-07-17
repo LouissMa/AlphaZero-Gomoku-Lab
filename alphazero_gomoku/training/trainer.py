@@ -17,7 +17,7 @@ from .config import ExperimentConfig
 from .metrics import JsonlMetricsWriter
 from .replay_buffer import ReplayBuffer
 from .reproducibility import seed_everything
-from .self_play import generate_self_play_game
+from .self_play import generate_self_play_games
 
 IterationCallback = Callable[[TrainingState, dict[str, Any]], None]
 
@@ -112,19 +112,41 @@ class AlphaZeroTrainer:
             run_root=checkpoint_path.parent.parent,
         )
 
-    def _collect_self_play(self) -> tuple[int, int, dict[int, int]]:
+    def _collect_self_play(self) -> tuple[int, int, dict[int, int], dict[str, Any]]:
         positions = 0
         winners: dict[int, int] = {}
-        for _ in range(self.config.self_play.games_per_iteration):
-            result = generate_self_play_game(
-                self.network,
-                self.config.board,
-                self.config.self_play,
-            )
+        batch = generate_self_play_games(
+            self.network,
+            self.config.board,
+            self.config.self_play,
+            self.random_generator,
+        )
+        for result in batch.results:
             self.replay.extend(result.samples)
             positions += len(result.samples)
             winners[result.winner] = winners.get(result.winner, 0) + 1
-        return self.config.self_play.games_per_iteration, positions, winners
+
+        profile = batch.profile
+        performance: dict[str, Any] = {
+            "self_play_seconds": profile.elapsed_seconds,
+            "positions_per_second": profile.positions_per_second,
+            "simulations": profile.simulations,
+            "simulations_per_second": profile.simulations_per_second,
+            "tree_reuse_count": profile.tree_reuse_count,
+            "tree_reset_count": profile.tree_reset_count,
+            "inference_requests": profile.inference.requests,
+            "inference_batches": profile.inference.batches,
+            "mean_inference_batch_size": profile.inference.mean_batch_size,
+            "inference_batch_utilization": profile.inference.mean_batch_size
+            / self.config.self_play.inference_batch_size,
+            "max_inference_batch_size": profile.inference.max_batch_size,
+            "inference_seconds": profile.inference.inference_seconds,
+            "parallel_games": min(
+                self.config.self_play.parallel_games,
+                self.config.self_play.games_per_iteration,
+            ),
+        }
+        return profile.games, positions, winners, performance
 
     def _optimize(self) -> list[dict[str, float]]:
         if len(self.replay) < self.config.optimization.batch_size:
@@ -169,7 +191,7 @@ class AlphaZeroTrainer:
             return self.state
 
         for iteration in range(self.state.iteration + 1, target + 1):
-            games, positions, winners = self._collect_self_play()
+            games, positions, winners, performance = self._collect_self_play()
             updates = self._optimize()
             self.state = replace(
                 self.state,
@@ -183,6 +205,7 @@ class AlphaZeroTrainer:
                 "replay_size": len(self.replay),
                 "optimizer_updates": len(updates),
                 "training_step": self.network.training_step,
+                **performance,
                 "winners": {str(key): value for key, value in sorted(winners.items())},
                 **self._mean_metrics(updates),
             }

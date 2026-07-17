@@ -72,6 +72,36 @@ def _train(args: argparse.Namespace) -> int:
     return 0
 
 
+def _benchmark(args: argparse.Namespace) -> int:
+    try:
+        from alphazero_gomoku.training.benchmark import (
+            run_self_play_benchmark,
+            write_benchmark_report,
+        )
+        from alphazero_gomoku.training.config import load_experiment_config
+    except ImportError as error:
+        if error.name == "torch":
+            raise SystemExit(
+                'PyTorch is required for benchmarking. Install it with: pip install -e ".[train]"'
+            ) from error
+        raise
+
+    config = load_experiment_config(args.config)
+    if args.device is not None:
+        config = replace(
+            config,
+            network=replace(config.network, device=args.device),
+        )
+    report = run_self_play_benchmark(config, games=args.games)
+    destination = write_benchmark_report(report, args.output)
+    performance = report.performance
+    print(
+        f"Benchmark complete: {performance['simulations_per_second']:.2f} simulations/s, "
+        f"mean batch={performance['mean_inference_batch_size']:.2f}. Report: {destination}"
+    )
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gomoku",
@@ -106,6 +136,23 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Override the configured device.",
     )
     train.set_defaults(handler=_train)
+    benchmark = subparsers.add_parser(
+        "benchmark",
+        help="Profile parallel self-play and batched neural inference.",
+    )
+    benchmark.add_argument("--config", type=Path, required=True)
+    benchmark.add_argument("--games", type=int, default=None)
+    benchmark.add_argument(
+        "--output",
+        type=Path,
+        default=Path("benchmarks/self_play.json"),
+    )
+    benchmark.add_argument(
+        "--device",
+        choices=("auto", "cpu", "cuda"),
+        default=None,
+    )
+    benchmark.set_defaults(handler=_benchmark)
     return parser
 
 

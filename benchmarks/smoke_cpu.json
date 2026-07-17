@@ -1,0 +1,38 @@
+{
+  "device": "cpu",
+  "format_version": 1,
+  "hardware": {
+    "cpu_threads": 10,
+    "cuda_device": null,
+    "cuda_peak_memory_mb": 0.0,
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.2",
+    "pytorch": "2.6.0+cu124"
+  },
+  "performance": {
+    "elapsed_seconds": 0.5972615000064252,
+    "inference_batch_utilization": 0.3888888888888889,
+    "inference_batches": 18,
+    "inference_seconds": 0.22166029998334125,
+    "max_inference_batch_size": 2,
+    "mean_inference_batch_size": 1.5555555555555556,
+    "positions_per_second": 23.440318855056606,
+    "simulations_per_second": 46.88063771011321,
+    "tree_reset_count": 2,
+    "tree_reuse_count": 14
+  },
+  "timestamp": "2026-07-17T08:04:57.492438+00:00",
+  "workload": {
+    "board": {
+      "height": 3,
+      "n_in_row": 3,
+      "width": 3
+    },
+    "games": 2,
+    "inference_batch_size": 4,
+    "parallel_games": 2,
+    "positions": 14,
+    "simulations": 28,
+    "simulations_per_move": 2
+  }
+}
