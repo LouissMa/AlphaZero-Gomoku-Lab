@@ -12,10 +12,7 @@ from collections import defaultdict, deque
 from alphazero_gomoku.game import Board, Game
 from alphazero_gomoku.mcts_pure import MCTSPlayer as MCTS_Pure
 from alphazero_gomoku.mcts_alphaZero import MCTSPlayer
-from alphazero_gomoku.policy_value_net import PolicyValueNet  # Theano and Lasagne
-# from alphazero_gomoku.policy_value_net_pytorch import PolicyValueNet  # Pytorch
-# from alphazero_gomoku.policy_value_net_tensorflow import PolicyValueNet # Tensorflow
-# from alphazero_gomoku.policy_value_net_keras import PolicyValueNet # Keras
+from alphazero_gomoku.policy_value_net_pytorch import PolicyValueNet
 
 
 class TrainPipeline():
@@ -176,12 +173,12 @@ class TrainPipeline():
                 if (i+1) % self.check_freq == 0:
                     print("current self-play batch: {}".format(i+1))
                     win_ratio = self.policy_evaluate()
-                    self.policy_value_net.save_model('./models/current_policy.model')
+                    self.policy_value_net.save_model('./models/current_policy.pt')
                     if win_ratio > self.best_win_ratio:
                         print("New best policy!!!!!!!!")
                         self.best_win_ratio = win_ratio
                         # update the best_policy
-                        self.policy_value_net.save_model('./models/best_policy.model')
+                        self.policy_value_net.save_model('./models/best_policy.pt')
                         if (self.best_win_ratio == 1.0 and
                                 self.pure_mcts_playout_num < 5000):
                             self.pure_mcts_playout_num += 1000
