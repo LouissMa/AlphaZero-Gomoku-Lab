@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import random
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -13,6 +15,27 @@ from alphazero_gomoku.training.config import ExperimentConfig, load_experiment_c
 from alphazero_gomoku.training.metrics import JsonlMetricsWriter, read_metrics
 from alphazero_gomoku.training.replay_buffer import ReplayBuffer, ReplaySample
 from alphazero_gomoku.training.reproducibility import seed_everything
+
+
+def test_training_package_import_does_not_require_torch() -> None:
+    script = """
+import builtins
+
+original_import = builtins.__import__
+
+def import_without_torch(name, *args, **kwargs):
+    if name == "torch" or name.startswith("torch."):
+        raise ModuleNotFoundError("torch is intentionally unavailable")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = import_without_torch
+
+from alphazero_gomoku import training
+
+assert training.ExperimentConfig
+assert training.ReplayBuffer
+"""
+    subprocess.run([sys.executable, "-c", script], check=True)
 
 
 def make_sample(move: int, outcome: float = 1.0) -> ReplaySample:

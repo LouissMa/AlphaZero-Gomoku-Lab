@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 .pytest_cache/
 .ruff_cache/
+.pytest_*/
 .coverage
 htmlcov/
 build/
@@ -12,3 +13,4 @@ models/current_policy.model
 models/best_policy.model
 models/current_policy.pt
 models/best_policy.pt
+runs/

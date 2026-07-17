@@ -21,8 +21,11 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 3. Reproducible training pipeline
 
+**Status: complete.**
+
 - Typed configuration files, deterministic seeds, resumable checkpoints, and metrics.
 - Replay-buffer persistence and explicit model/data version metadata.
+- End-to-end self-play, optimization, CLI execution, and resume smoke tests.
 
 ## 4. Scalable self-play and MCTS
 

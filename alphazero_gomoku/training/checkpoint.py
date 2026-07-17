@@ -15,6 +15,8 @@ from .config import ExperimentConfig
 from .replay_buffer import ReplayBuffer
 from .reproducibility import capture_random_state, restore_random_state
 
+CHECKPOINT_FORMAT_VERSION = 1
+
 
 @dataclass(frozen=True, slots=True)
 class TrainingState:
@@ -61,6 +63,7 @@ class CheckpointManager:
         replay.save(temporary / "replay.npz")
         manifest = {
             "config": config.to_dict(),
+            "format_version": CHECKPOINT_FORMAT_VERSION,
             "training_state": asdict(state),
             "random_state": capture_random_state(random_generator),
         }
@@ -90,6 +93,9 @@ class CheckpointManager:
         source = Path(checkpoint) if checkpoint is not None else self.latest()
         manifest = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
         config = ExperimentConfig.from_dict(manifest["config"])
+        format_version = int(manifest.get("format_version", 1))
+        if format_version != CHECKPOINT_FORMAT_VERSION:
+            raise ValueError(f"unsupported checkpoint format version: {format_version}")
         state = TrainingState(**manifest["training_state"])
         network = PolicyValueNet.from_checkpoint(
             source / "model.pt",

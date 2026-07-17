@@ -9,6 +9,8 @@ from pathlib import Path
 
 import numpy as np
 
+REPLAY_FORMAT_VERSION = 1
+
 
 @dataclass(frozen=True, slots=True)
 class ReplaySample:
@@ -74,11 +76,19 @@ class ReplayBuffer:
             policies=np.stack([sample.policy for sample in self._samples]),
             outcomes=np.asarray([sample.outcome for sample in self._samples], dtype=np.float32),
             capacity=np.asarray(self.capacity, dtype=np.int64),
+            format_version=np.asarray(REPLAY_FORMAT_VERSION, dtype=np.int64),
         )
 
     @classmethod
     def load(cls, path: str | Path) -> ReplayBuffer:
         with np.load(path, allow_pickle=False) as data:
+            format_version = (
+                int(data["format_version"])
+                if "format_version" in data.files
+                else REPLAY_FORMAT_VERSION
+            )
+            if format_version != REPLAY_FORMAT_VERSION:
+                raise ValueError(f"unsupported replay format version: {format_version}")
             buffer = cls(capacity=int(data["capacity"]))
             for state, policy, outcome in zip(
                 data["states"], data["policies"], data["outcomes"], strict=True
