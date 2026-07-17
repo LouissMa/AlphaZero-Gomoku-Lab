@@ -11,26 +11,38 @@ from .replay_buffer import ReplayBuffer, ReplaySample
 from .reproducibility import seed_everything
 
 if TYPE_CHECKING:
+    from .benchmark import BenchmarkReport
     from .checkpoint import CheckpointManager, ResumeBundle, TrainingState
-    from .self_play import SelfPlayResult
+    from .inference import BatchedPolicyEvaluator, InferenceStats
+    from .self_play import SelfPlayBatch, SelfPlayProfile, SelfPlayResult
     from .trainer import AlphaZeroTrainer
 
 _LAZY_EXPORTS = {
     "AlphaZeroTrainer": ".trainer",
+    "BatchedPolicyEvaluator": ".inference",
+    "BenchmarkReport": ".benchmark",
     "CheckpointManager": ".checkpoint",
+    "InferenceStats": ".inference",
     "ResumeBundle": ".checkpoint",
+    "SelfPlayBatch": ".self_play",
+    "SelfPlayProfile": ".self_play",
     "SelfPlayResult": ".self_play",
     "TrainingState": ".checkpoint",
 }
 
 __all__ = [
     "AlphaZeroTrainer",
+    "BatchedPolicyEvaluator",
+    "BenchmarkReport",
     "CheckpointManager",
     "ExperimentConfig",
+    "InferenceStats",
     "JsonlMetricsWriter",
     "ReplayBuffer",
     "ReplaySample",
     "ResumeBundle",
+    "SelfPlayBatch",
+    "SelfPlayProfile",
     "SelfPlayResult",
     "TrainingState",
     "load_experiment_config",

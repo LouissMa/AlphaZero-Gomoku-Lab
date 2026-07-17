@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "alphazero_gomoku/policy_value_net_pytorch.py"
+      - "alphazero_gomoku/mcts_alphaZero.py"
       - "tests/test_policy_value_net_pytorch.py"
       - "alphazero_gomoku/training/**"
       - "tests/test_training_*.py"
@@ -14,6 +15,7 @@ on:
   pull_request:
     paths:
       - "alphazero_gomoku/policy_value_net_pytorch.py"
+      - "alphazero_gomoku/mcts_alphaZero.py"
       - "tests/test_policy_value_net_pytorch.py"
       - "alphazero_gomoku/training/**"
       - "tests/test_training_*.py"
@@ -47,4 +49,4 @@ jobs:
         run: ruff check alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/cli.py tests
 
       - name: Test modern backend
-        run: python -m pytest tests/test_policy_value_net_pytorch.py tests/test_training_checkpoint.py tests/test_training_pipeline.py
+        run: python -m pytest tests/test_policy_value_net_pytorch.py tests/test_training_checkpoint.py tests/test_training_pipeline.py tests/test_scalable_self_play.py

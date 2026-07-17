@@ -16,6 +16,9 @@ preserving the bundled NumPy inference path and pretrained models.
 - Versioned, portable checkpoints containing complete architecture metadata.
 - Reproducible self-play training with persistent replay, JSONL metrics, and
   interruption-safe resume.
+- Centralized batched neural inference across parallel self-play actors.
+- MCTS tree reuse, throughput profiling, hardware metadata, and versioned
+  benchmark reports.
 - Pure MCTS baseline player.
 - Terminal and Pygame human-versus-AI interfaces.
 - NumPy inference with bundled 6x6/4-in-a-row and 8x8/5-in-a-row models.
@@ -79,6 +82,19 @@ gomoku train --resume runs/gomoku-6x6-baseline/checkpoints/step_000050
 
 See the [training guide](docs/TRAINING.md) for outputs and reproducibility details.
 
+## Parallel self-play benchmark
+
+Profile the complete scalable search path without changing training state:
+
+```bash
+gomoku benchmark --config configs/train_smoke.toml --games 2 --device cpu
+```
+
+The report includes simulations per second, inference batch utilization, tree
+reuse, runtime versions, CPU threads, and CUDA memory when available. See the
+[scalable self-play guide](docs/SCALABLE_SELF_PLAY.md) and committed
+[smoke CPU report](benchmarks/smoke_cpu.json).
+
 ## Development
 
 ```bash
@@ -94,7 +110,7 @@ See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 - [x] Modern engineering baseline.
 - [x] Modern PyTorch residual policy-value network.
 - [x] Reproducible training pipeline.
-- [ ] Batched inference and parallel self-play.
+- [x] Batched inference and parallel self-play.
 - [ ] Elo evaluation arena.
 - [ ] Gumbel AlphaZero.
 - [ ] Interactive web application.
