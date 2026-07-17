@@ -5,11 +5,15 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 1. Modern engineering baseline
 
+**Status: complete.**
+
 - Package metadata, dependency groups, CLI, lint configuration, and game-engine tests.
 - Preserve the existing NumPy inference path and bundled models.
 - Document legacy training backends until their replacement is complete.
 
 ## 2. Modern PyTorch network
+
+**Status: complete.**
 
 - A configurable residual policy-value network on a supported PyTorch release.
 - Device-independent checkpoints, mixed precision, and optional compilation.

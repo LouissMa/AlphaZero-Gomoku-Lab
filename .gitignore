@@ -10,3 +10,5 @@ dist/
 *.egg-info/
 models/current_policy.model
 models/best_policy.model
+models/current_policy.pt
+models/best_policy.pt
