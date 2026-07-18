@@ -1,0 +1,16 @@
+[board]
+width = 3
+height = 3
+n_in_row = 3
+
+[comparison]
+games = 2
+simulations_per_move = 4
+max_considered_actions = 3
+c_puct = 1.5
+gumbel_scale = 1.0
+q_value_scale = 0.1
+q_visit_offset = 10.0
+confidence = 0.95
+seed = 2026
+device = "cpu"

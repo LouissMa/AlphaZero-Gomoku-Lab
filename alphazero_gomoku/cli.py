@@ -188,6 +188,33 @@ def _arena(args: argparse.Namespace) -> int:
     return 0
 
 
+def _compare_search(args: argparse.Namespace) -> int:
+    try:
+        from alphazero_gomoku.gumbel.benchmark import (
+            compare_search_algorithms,
+            load_search_comparison_config,
+            write_search_comparison_report,
+        )
+    except ImportError as error:
+        if error.name == "torch":
+            raise SystemExit(
+                'PyTorch is required for comparison. Install it with: pip install -e ".[train]"'
+            ) from error
+        raise
+    config = load_search_comparison_config(args.config)
+    if args.device is not None:
+        config = replace(config, device=args.device)
+    report = compare_search_algorithms(args.model, config)
+    destination = write_search_comparison_report(report, args.output)
+    summary = report.match.summary
+    print(
+        f"Search comparison complete: Gumbel score={summary.score:.3f}, "
+        f"Elo={summary.elo_difference:+.1f}, games={summary.games}. "
+        f"Report: {destination}"
+    )
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gomoku",
@@ -258,6 +285,23 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
     )
     arena.set_defaults(handler=_arena)
+    comparison = subparsers.add_parser(
+        "compare-search",
+        help="Compare Gumbel AlphaZero with PUCT at an equal simulation budget.",
+    )
+    comparison.add_argument("--model", type=Path, required=True)
+    comparison.add_argument("--config", type=Path, required=True)
+    comparison.add_argument(
+        "--output",
+        type=Path,
+        default=Path("benchmarks/gumbel_vs_puct.json"),
+    )
+    comparison.add_argument(
+        "--device",
+        choices=("auto", "cpu", "cuda"),
+        default=None,
+    )
+    comparison.set_defaults(handler=_compare_search)
     return parser
 
 
