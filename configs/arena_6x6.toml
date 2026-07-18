@@ -1,0 +1,16 @@
+[board]
+width = 6
+height = 6
+n_in_row = 4
+
+[arena]
+games_per_opponent = 20
+simulations_per_move = 100
+pure_mcts_playouts = 100
+c_puct = 5.0
+confidence = 0.95
+promotion_score = 0.55
+promotion_lower_bound = 0.50
+seed = 2026
+device = "auto"
+baselines = ["random", "heuristic", "pure_mcts"]

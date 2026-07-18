@@ -6,7 +6,7 @@ import argparse
 import importlib.util
 import platform
 from collections.abc import Sequence
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 
@@ -102,6 +102,92 @@ def _benchmark(args: argparse.Namespace) -> int:
     return 0
 
 
+def _arena(args: argparse.Namespace) -> int:
+    if args.promote_to is not None and args.incumbent is None:
+        raise SystemExit("--promote-to requires --incumbent")
+    try:
+        from alphazero_gomoku.evaluation.arena import (
+            run_tournament,
+            write_tournament_report,
+        )
+        from alphazero_gomoku.evaluation.config import load_arena_config
+        from alphazero_gomoku.evaluation.neural import (
+            NeuralMCTSFactory,
+            resolve_model_path,
+        )
+        from alphazero_gomoku.evaluation.players import (
+            HeuristicFactory,
+            PureMCTSFactory,
+            RandomFactory,
+        )
+        from alphazero_gomoku.evaluation.promotion import (
+            decide_promotion,
+            promote_model,
+        )
+    except ImportError as error:
+        if error.name == "torch":
+            raise SystemExit(
+                'PyTorch is required for evaluation. Install it with: pip install -e ".[train]"'
+            ) from error
+        raise
+
+    config = load_arena_config(args.config)
+    if args.device is not None:
+        config = replace(config, device=args.device)
+    candidate = NeuralMCTSFactory(
+        args.candidate,
+        simulations_per_move=config.simulations_per_move,
+        c_puct=config.c_puct,
+        device=config.device,
+    )
+    candidate.validate_board(
+        width=config.board.width,
+        height=config.board.height,
+    )
+    factories = {
+        "random": lambda: RandomFactory(),
+        "heuristic": lambda: HeuristicFactory(),
+        "pure_mcts": lambda: PureMCTSFactory(
+            c_puct=config.c_puct,
+            playouts=config.pure_mcts_playouts,
+        ),
+    }
+    opponents = [factories[name]() for name in config.baselines]
+    if args.incumbent is not None:
+        incumbent_factory = NeuralMCTSFactory(
+            args.incumbent,
+            simulations_per_move=config.simulations_per_move,
+            c_puct=config.c_puct,
+            device=config.device,
+            name="incumbent",
+        )
+        incumbent_factory.validate_board(
+            width=config.board.width,
+            height=config.board.height,
+        )
+        opponents.append(incumbent_factory)
+
+    report = run_tournament(candidate, opponents, config)
+    if args.incumbent is not None:
+        incumbent = next(match for match in report.matches if match.opponent == "incumbent")
+        decision = decide_promotion(
+            incumbent.summary,
+            required_score=config.promotion_score,
+            required_lower_bound=config.promotion_lower_bound,
+        )
+        report = replace(report, promotion=asdict(decision))
+        if args.promote_to is not None:
+            promote_model(resolve_model_path(args.candidate), args.promote_to, decision)
+    destination = write_tournament_report(report, args.output)
+    print(
+        f"Arena complete: score={report.overall.score:.3f}, "
+        f"Elo={report.overall.elo_difference:+.1f}, "
+        f"{config.confidence:.0%} CI=[{report.overall.confidence_low:.3f}, "
+        f"{report.overall.confidence_high:.3f}]. Report: {destination}"
+    )
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gomoku",
@@ -153,6 +239,25 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
     )
     benchmark.set_defaults(handler=_benchmark)
+    arena = subparsers.add_parser(
+        "arena",
+        help="Evaluate a checkpoint against baselines and an incumbent model.",
+    )
+    arena.add_argument("--candidate", type=Path, required=True)
+    arena.add_argument("--config", type=Path, required=True)
+    arena.add_argument("--incumbent", type=Path)
+    arena.add_argument("--promote-to", type=Path)
+    arena.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/arena.json"),
+    )
+    arena.add_argument(
+        "--device",
+        choices=("auto", "cpu", "cuda"),
+        default=None,
+    )
+    arena.set_defaults(handler=_arena)
     return parser
 
 
