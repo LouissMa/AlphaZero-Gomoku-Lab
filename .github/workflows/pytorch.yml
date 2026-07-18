@@ -8,8 +8,10 @@ on:
       - "tests/test_policy_value_net_pytorch.py"
       - "alphazero_gomoku/training/**"
       - "alphazero_gomoku/evaluation/**"
+      - "alphazero_gomoku/gumbel/**"
       - "tests/test_training_*.py"
       - "tests/test_evaluation_*.py"
+      - "tests/test_gumbel_*.py"
       - "configs/*.toml"
       - "alphazero_gomoku/cli.py"
       - "pyproject.toml"
@@ -21,8 +23,10 @@ on:
       - "tests/test_policy_value_net_pytorch.py"
       - "alphazero_gomoku/training/**"
       - "alphazero_gomoku/evaluation/**"
+      - "alphazero_gomoku/gumbel/**"
       - "tests/test_training_*.py"
       - "tests/test_evaluation_*.py"
+      - "tests/test_gumbel_*.py"
       - "configs/*.toml"
       - "alphazero_gomoku/cli.py"
       - "pyproject.toml"
@@ -50,7 +54,7 @@ jobs:
         run: python -m pip install --upgrade pip ".[dev,train]"
 
       - name: Check modern backend
-        run: ruff check alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/cli.py tests
+        run: ruff check alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/gumbel alphazero_gomoku/cli.py tests
 
       - name: Test modern backend
-        run: python -m pytest tests/test_policy_value_net_pytorch.py tests/test_training_checkpoint.py tests/test_training_pipeline.py tests/test_scalable_self_play.py tests/test_evaluation_arena.py tests/test_evaluation_neural.py tests/test_evaluation_cli.py
+        run: python -m pytest tests/test_policy_value_net_pytorch.py tests/test_training_checkpoint.py tests/test_training_pipeline.py tests/test_scalable_self_play.py tests/test_evaluation_arena.py tests/test_evaluation_neural.py tests/test_evaluation_cli.py tests/test_gumbel_math.py tests/test_gumbel_search.py tests/test_gumbel_training.py tests/test_gumbel_benchmark.py

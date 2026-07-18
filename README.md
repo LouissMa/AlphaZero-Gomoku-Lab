@@ -21,6 +21,8 @@ preserving the bundled NumPy inference path and pretrained models.
   benchmark reports.
 - Reproducible evaluation tournaments with alternating first player, Wilson
   confidence intervals, Elo estimates, and confidence-gated model promotion.
+- Gumbel AlphaZero with Gumbel-Top-k root sampling, Sequential Halving,
+  Completed-Q policy targets, and equal-budget PUCT comparisons.
 - Pure MCTS baseline player.
 - Terminal and Pygame human-versus-AI interfaces.
 - NumPy inference with bundled 6x6/4-in-a-row and 8x8/5-in-a-row models.
@@ -110,12 +112,27 @@ Add `--incumbent models/best.pt --promote-to models/best.pt` to run a
 head-to-head promotion gate. See the [evaluation arena guide](docs/EVALUATION_ARENA.md)
 for statistical interpretation and the full workflow.
 
+## Gumbel AlphaZero
+
+Train with the low-simulation policy-improvement search and compare it fairly
+against PUCT using one checkpoint:
+
+```bash
+gomoku train --config configs/train_gumbel_smoke.toml --iterations 1
+gomoku compare-search \
+  --model runs/gomoku-gumbel-smoke/checkpoints/step_000001 \
+  --config configs/compare_search_smoke.toml
+```
+
+See the [Gumbel AlphaZero guide](docs/GUMBEL_ALPHAZERO.md) for the formulas,
+configuration, benchmark schema, and implementation scope.
+
 ## Development
 
 ```bash
 python -m pip install -e ".[dev,train]"
 python -m pytest
-ruff check alphazero_gomoku/cli.py alphazero_gomoku/policy_value_net_pytorch.py tests
+ruff check alphazero_gomoku/cli.py alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/gumbel tests
 ```
 
 See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
@@ -127,7 +144,7 @@ See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 - [x] Reproducible training pipeline.
 - [x] Batched inference and parallel self-play.
 - [x] Elo evaluation arena.
-- [ ] Gumbel AlphaZero.
+- [x] Gumbel AlphaZero.
 - [ ] Interactive web application.
 - [ ] Containerized open-source release and benchmark report.
 

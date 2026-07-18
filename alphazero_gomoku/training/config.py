@@ -54,6 +54,11 @@ class SelfPlayConfig:
     games_per_iteration: int = 1
     simulations_per_move: int = 400
     c_puct: float = 5.0
+    search_algorithm: str = "puct"
+    max_considered_actions: int = 16
+    gumbel_scale: float = 1.0
+    q_value_scale: float = 0.1
+    q_visit_offset: float = 50.0
     parallel_games: int = 1
     inference_batch_size: int = 8
     inference_wait_ms: float = 2.0
@@ -64,6 +69,12 @@ class SelfPlayConfig:
             raise ValueError("self-play counts must be positive")
         if self.c_puct <= 0 or self.temperature <= 0:
             raise ValueError("c_puct and temperature must be positive")
+        if self.search_algorithm not in {"puct", "gumbel"}:
+            raise ValueError("search_algorithm must be 'puct' or 'gumbel'")
+        if self.max_considered_actions <= 0:
+            raise ValueError("max_considered_actions must be positive")
+        if self.gumbel_scale < 0 or self.q_value_scale <= 0 or self.q_visit_offset < 0:
+            raise ValueError("Gumbel search scales are invalid")
         if self.parallel_games <= 0 or self.inference_batch_size <= 0:
             raise ValueError("parallel_games and inference_batch_size must be positive")
         if self.inference_wait_ms < 0:
