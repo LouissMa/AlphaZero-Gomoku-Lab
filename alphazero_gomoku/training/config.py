@@ -54,6 +54,9 @@ class SelfPlayConfig:
     games_per_iteration: int = 1
     simulations_per_move: int = 400
     c_puct: float = 5.0
+    parallel_games: int = 1
+    inference_batch_size: int = 8
+    inference_wait_ms: float = 2.0
     temperature: float = 1.0
 
     def __post_init__(self) -> None:
@@ -61,6 +64,10 @@ class SelfPlayConfig:
             raise ValueError("self-play counts must be positive")
         if self.c_puct <= 0 or self.temperature <= 0:
             raise ValueError("c_puct and temperature must be positive")
+        if self.parallel_games <= 0 or self.inference_batch_size <= 0:
+            raise ValueError("parallel_games and inference_batch_size must be positive")
+        if self.inference_wait_ms < 0:
+            raise ValueError("inference_wait_ms must be non-negative")
 
 
 @dataclass(frozen=True, slots=True)

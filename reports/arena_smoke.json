@@ -1,0 +1,148 @@
+{
+  "candidate": "candidate",
+  "config": {
+    "baselines": [
+      "random",
+      "heuristic",
+      "pure_mcts"
+    ],
+    "board": {
+      "height": 3,
+      "n_in_row": 3,
+      "width": 3
+    },
+    "c_puct": 1.5,
+    "confidence": 0.95,
+    "device": "cpu",
+    "games_per_opponent": 2,
+    "promotion_lower_bound": 0.5,
+    "promotion_score": 0.55,
+    "pure_mcts_playouts": 5,
+    "seed": 2026,
+    "simulations_per_move": 2
+  },
+  "format_version": 1,
+  "matches": [
+    {
+      "games": [
+        {
+          "candidate_player": 1,
+          "elapsed_seconds": 0.00973249999969994,
+          "first_player": "candidate",
+          "index": 0,
+          "moves": 7,
+          "result": "win",
+          "seed": 3300764713747675561,
+          "winner": "candidate"
+        },
+        {
+          "candidate_player": 2,
+          "elapsed_seconds": 0.006129899999905319,
+          "first_player": "random",
+          "index": 1,
+          "moves": 8,
+          "result": "win",
+          "seed": 11804314397344746686,
+          "winner": "candidate"
+        }
+      ],
+      "opponent": "random",
+      "summary": {
+        "confidence": 0.95,
+        "confidence_high": 1.0,
+        "confidence_low": 0.3423802275066532,
+        "draws": 0,
+        "elo_difference": 190.84850188786498,
+        "games": 2,
+        "losses": 0,
+        "score": 1.0,
+        "wins": 2
+      }
+    },
+    {
+      "games": [
+        {
+          "candidate_player": 1,
+          "elapsed_seconds": 0.006558199999744829,
+          "first_player": "candidate",
+          "index": 0,
+          "moves": 8,
+          "result": "loss",
+          "seed": 8619580609625321961,
+          "winner": "heuristic"
+        },
+        {
+          "candidate_player": 2,
+          "elapsed_seconds": 0.0071324999998978456,
+          "first_player": "heuristic",
+          "index": 1,
+          "moves": 9,
+          "result": "draw",
+          "seed": 6834528402736651378,
+          "winner": "draw"
+        }
+      ],
+      "opponent": "heuristic",
+      "summary": {
+        "confidence": 0.95,
+        "confidence_high": 0.8021325442376888,
+        "confidence_low": 0.026677342008984584,
+        "draws": 1,
+        "elo_difference": -190.84850188786498,
+        "games": 2,
+        "losses": 1,
+        "score": 0.25,
+        "wins": 0
+      }
+    },
+    {
+      "games": [
+        {
+          "candidate_player": 1,
+          "elapsed_seconds": 0.0057809999998426065,
+          "first_player": "candidate",
+          "index": 0,
+          "moves": 6,
+          "result": "loss",
+          "seed": 6547069233333351961,
+          "winner": "pure_mcts"
+        },
+        {
+          "candidate_player": 2,
+          "elapsed_seconds": 0.003887599999870872,
+          "first_player": "pure_mcts",
+          "index": 1,
+          "moves": 5,
+          "result": "loss",
+          "seed": 14582487766852987687,
+          "winner": "pure_mcts"
+        }
+      ],
+      "opponent": "pure_mcts",
+      "summary": {
+        "confidence": 0.95,
+        "confidence_high": 0.6576197724933468,
+        "confidence_low": 0.0,
+        "draws": 0,
+        "elo_difference": -190.84850188786498,
+        "games": 2,
+        "losses": 2,
+        "score": 0.0,
+        "wins": 0
+      }
+    }
+  ],
+  "overall": {
+    "confidence": 0.95,
+    "confidence_high": 0.7589217890180476,
+    "confidence_low": 0.1394672589656466,
+    "draws": 1,
+    "elo_difference": -58.451214271295186,
+    "games": 6,
+    "losses": 3,
+    "score": 0.4166666666666667,
+    "wins": 2
+  },
+  "promotion": null,
+  "timestamp": "2026-07-18T01:24:29.721577+00:00"
+}

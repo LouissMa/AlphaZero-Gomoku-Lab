@@ -70,6 +70,24 @@ A device can be changed while restoring a portable checkpoint:
 gomoku train --resume <checkpoint-directory> --device cuda
 ```
 
+## Scalable self-play
+
+Multiple games can share centralized batched inference while retaining their
+own board, MCTS tree, and deterministic random stream:
+
+```toml
+[self_play]
+games_per_iteration = 8
+parallel_games = 4
+simulations_per_move = 400
+inference_batch_size = 16
+inference_wait_ms = 2.0
+```
+
+Training metrics include positions and simulations per second, inference batch
+utilization, inference time, and MCTS root reuse. See the
+[scalable self-play guide](SCALABLE_SELF_PLAY.md) for tuning and benchmarking.
+
 ## Reproducibility contract
 
 When `run.deterministic = true`, the pipeline seeds Python, legacy NumPy,

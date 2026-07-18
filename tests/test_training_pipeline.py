@@ -100,8 +100,19 @@ def test_train_cli_requires_exactly_one_source() -> None:
 
     config_args = parser.parse_args(["train", "--config", "experiment.toml"])
     resume_args = parser.parse_args(["train", "--resume", "checkpoints/step_000001"])
+    benchmark_args = parser.parse_args(
+        [
+            "benchmark",
+            "--config",
+            "experiment.toml",
+            "--games",
+            "4",
+        ]
+    )
 
     assert config_args.config == Path("experiment.toml")
     assert config_args.resume is None
     assert resume_args.resume == Path("checkpoints/step_000001")
     assert resume_args.config is None
+    assert benchmark_args.config == Path("experiment.toml")
+    assert benchmark_args.games == 4
