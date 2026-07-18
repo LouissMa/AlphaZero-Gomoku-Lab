@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Ruff
         if: matrix.python-version == '3.13'
-        run: ruff check alphazero_gomoku/cli.py alphazero_gomoku/__main__.py tests
+        run: ruff check alphazero_gomoku/cli.py alphazero_gomoku/__main__.py alphazero_gomoku/evaluation tests
 
       - name: Smoke-test CLI
         run: python -m alphazero_gomoku doctor

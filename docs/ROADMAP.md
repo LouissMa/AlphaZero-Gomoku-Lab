@@ -37,8 +37,11 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 5. Evaluation arena
 
+**Status: complete.**
+
 - Alternating colors, confidence intervals, Elo ratings, and automatic model promotion.
 - Reproducible tournaments against random, heuristic, pure-MCTS, and neural players.
+- Versioned JSON reports, configurable promotion thresholds, and atomic incumbent updates.
 
 ## 6. Gumbel AlphaZero
 
