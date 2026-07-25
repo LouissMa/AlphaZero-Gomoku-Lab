@@ -23,6 +23,8 @@ preserving the bundled NumPy inference path and pretrained models.
   confidence intervals, Elo estimates, and confidence-gated model promotion.
 - Gumbel AlphaZero with Gumbel-Top-k root sampling, Sequential Halving,
   Completed-Q policy targets, and equal-budget PUCT comparisons.
+- Interactive Canvas web application with real model selection, policy heatmaps,
+  value estimates, undo, replay, and PUCT/Gumbel controls.
 - Pure MCTS baseline player.
 - Terminal and Pygame human-versus-AI interfaces.
 - NumPy inference with bundled 6x6/4-in-a-row and 8x8/5-in-a-row models.
@@ -127,12 +129,25 @@ gomoku compare-search \
 See the [Gumbel AlphaZero guide](docs/GUMBEL_ALPHAZERO.md) for the formulas,
 configuration, benchmark schema, and implementation scope.
 
+## Interactive web application
+
+Launch the portfolio-ready browser experience:
+
+```bash
+python -m pip install -e ".[web]"
+gomoku serve
+```
+
+Play against bundled AlphaZero models with PUCT or Gumbel search, inspect the
+policy heatmap and value estimate, undo turns, and replay the complete game. A
+non-root Docker image is included. See the [web application guide](docs/WEB_APP.md).
+
 ## Development
 
 ```bash
-python -m pip install -e ".[dev,train]"
+python -m pip install -e ".[dev,train,web]"
 python -m pytest
-ruff check alphazero_gomoku/cli.py alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/gumbel tests
+ruff check alphazero_gomoku/cli.py alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/gumbel alphazero_gomoku/web tests
 ```
 
 See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
@@ -145,7 +160,7 @@ See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 - [x] Batched inference and parallel self-play.
 - [x] Elo evaluation arena.
 - [x] Gumbel AlphaZero.
-- [ ] Interactive web application.
+- [x] Interactive web application.
 - [ ] Containerized open-source release and benchmark report.
 
 ## Project origin

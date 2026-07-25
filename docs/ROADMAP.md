@@ -53,6 +53,8 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 7. Interactive web application
 
+**Status: complete.**
+
 - Browser play, model selection, policy heatmaps, value estimates, and game replay.
 - A small inference API with containerized local deployment.
 
