@@ -215,6 +215,24 @@ def _compare_search(args: argparse.Namespace) -> int:
     return 0
 
 
+def _serve(args: argparse.Namespace) -> int:
+    try:
+        import uvicorn
+    except ImportError as error:
+        raise SystemExit(
+            'Web dependencies are required. Install them with: pip install -e ".[web]"'
+        ) from error
+    target: object
+    if args.reload:
+        target = "alphazero_gomoku.web.api:app"
+    else:
+        from alphazero_gomoku.web.api import create_app
+
+        target = create_app()
+    uvicorn.run(target, host=args.host, port=args.port, reload=args.reload)
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gomoku",
@@ -302,6 +320,14 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
     )
     comparison.set_defaults(handler=_compare_search)
+    server = subparsers.add_parser(
+        "serve",
+        help="Run the interactive AlphaZero Gomoku web application.",
+    )
+    server.add_argument("--host", default="127.0.0.1")
+    server.add_argument("--port", type=int, default=8000)
+    server.add_argument("--reload", action="store_true")
+    server.set_defaults(handler=_serve)
     return parser
 
 

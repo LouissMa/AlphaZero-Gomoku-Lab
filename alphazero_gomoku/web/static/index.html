@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ede5d2">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23b43b2b'/%3E%3Ccircle cx='32' cy='32' r='16' fill='%2318201e'/%3E%3C/svg%3E">
+  <title>Machine Kifu · AlphaZero Gomoku Lab</title>
+  <link rel="stylesheet" href="/static/styles.css?v=7">
+  <script src="/static/app.js?v=7" defer></script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="masthead">
+    <a class="wordmark" href="/" aria-label="AlphaZero Gomoku Lab 首页">
+      <span class="seal">零</span><span>Machine Kifu</span>
+    </a>
+    <p class="edition">ALPHAZERO GOMOKU LAB <span>·</span> 07</p>
+  </header>
+
+  <main class="layout">
+    <section class="board-column" aria-labelledby="game-title">
+      <div class="section-kicker"><span>LIVE INFERENCE</span><i></i><b id="turn-badge">准备中</b></div>
+      <div class="title-row">
+        <div><p class="eyebrow">人类 × 搜索智能</p><h1 id="game-title">在策略里<br><em>看见下一手。</em></h1></div>
+        <p class="move-index"><span id="move-count">00</span><small>手 / PLY</small></p>
+      </div>
+      <div class="board-frame" id="board-frame">
+        <canvas id="game-board" width="720" height="720" tabindex="0" aria-label="五子棋棋盘，点击交叉点落子"></canvas>
+        <div class="thinking" id="thinking" hidden><span></span><p>AI 正在推演<br><small>SEARCHING VARIATIONS</small></p></div>
+      </div>
+      <div class="board-caption">
+        <p id="status-text" aria-live="polite">正在载入模型目录…</p>
+        <p><kbd>F</kbd> 全屏 · 点击交叉点落子</p>
+      </div>
+      <div class="replay-strip" id="replay-panel" hidden>
+        <button id="replay-exit" class="text-button" type="button">退出复盘</button>
+        <input id="replay-slider" type="range" min="0" max="0" value="0" aria-label="复盘进度">
+        <output id="replay-output">0 / 0</output>
+      </div>
+    </section>
+
+    <aside class="control-column" aria-label="对局控制台">
+      <form id="setup-form" class="setup-card">
+        <div class="card-head"><span>01</span><div><p>CONFIGURATION</p><h2>对局设定</h2></div></div>
+        <label>对手模型<select id="model-select" name="model_id" aria-label="对手模型"></select></label>
+        <div class="field-pair">
+          <label>执子<select id="color-select" name="human_color"><option value="black">黑 · 先手</option><option value="white">白 · 后手</option></select></label>
+          <label>搜索<select id="search-select" name="search"><option value="gumbel">Gumbel</option><option value="puct">PUCT</option></select></label>
+        </div>
+        <label>模拟预算<select id="simulations-select" name="simulations"><option>8</option><option>16</option><option selected>32</option><option>64</option></select></label>
+        <button id="new-game" class="primary-button" type="submit"><span>开始新对局</span><b>↗</b></button>
+      </form>
+
+      <section class="analysis-card" aria-labelledby="analysis-title">
+        <div class="card-head"><span>02</span><div><p>POSITION READING</p><h2 id="analysis-title">局面判断</h2></div></div>
+        <div class="value-readout"><strong id="value-score">—</strong><div><p id="value-label">等待局面</p><div class="value-track"><i id="value-bar"></i><b></b></div><small>白方优势 ← 均衡 → 黑方优势</small></div></div>
+        <dl class="telemetry"><div><dt>推理耗时</dt><dd id="latency">— ms</dd></div><div><dt>搜索预算</dt><dd id="budget">—</dd></div><div><dt>胜负规则</dt><dd id="rule">—</dd></div></dl>
+        <label class="switch"><input id="heatmap-toggle" type="checkbox" checked><span></span><b>显示策略热力图</b></label>
+      </section>
+
+      <div class="actions">
+        <button id="undo-button" type="button" disabled>撤销一回合</button>
+        <button id="replay-button" type="button" disabled>查看完整复盘</button>
+      </div>
+      <p class="error-message" id="error-message" role="alert" aria-live="assertive"></p>
+      <p class="note"><i></i>热力图来自当前执子方的策略网络先验；价值数值同样采用当前方视角。</p>
+    </aside>
+  </main>
+
+  <footer><p>REAL SEARCH · REAL POLICY · EPHEMERAL SESSIONS</p><a href="https://deerflow.tech" target="_blank" rel="noreferrer">Created By Deerflow</a></footer>
+</body>
+</html>
