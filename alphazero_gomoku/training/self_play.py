@@ -11,6 +11,7 @@ from typing import Any
 import numpy as np
 
 from alphazero_gomoku.game import Board, Game
+from alphazero_gomoku.gumbel.player import GumbelMCTSPlayer
 from alphazero_gomoku.mcts_alphaZero import MCTSPlayer
 from alphazero_gomoku.policy_value_net_pytorch import PolicyValueNet
 
@@ -27,6 +28,8 @@ class SelfPlayResult:
     samples: tuple[ReplaySample, ...]
     tree_reuse_count: int
     tree_reset_count: int
+    search_algorithm: str
+    simulations: int
     elapsed_seconds: float
 
 
@@ -69,13 +72,27 @@ def generate_self_play_game(
         n_in_row=board_config.n_in_row,
     )
     game = Game(board)
-    player = MCTSPlayer(
-        policy_value_fn,
-        c_puct=self_play_config.c_puct,
-        n_playout=self_play_config.simulations_per_move,
-        is_selfplay=1,
-        rng=rng,
-    )
+    if self_play_config.search_algorithm == "gumbel":
+        player = GumbelMCTSPlayer(
+            policy_value_fn,
+            simulations=self_play_config.simulations_per_move,
+            max_considered_actions=self_play_config.max_considered_actions,
+            gumbel_scale=self_play_config.gumbel_scale,
+            q_value_scale=self_play_config.q_value_scale,
+            q_visit_offset=self_play_config.q_visit_offset,
+            is_selfplay=True,
+            rng=rng,
+        )
+        search_engine = player.search_engine
+    else:
+        player = MCTSPlayer(
+            policy_value_fn,
+            c_puct=self_play_config.c_puct,
+            n_playout=self_play_config.simulations_per_move,
+            is_selfplay=1,
+            rng=rng,
+        )
+        search_engine = player.mcts
     winner, records = game.start_self_play(
         player,
         temp=self_play_config.temperature,
@@ -89,8 +106,10 @@ def generate_self_play_game(
     return SelfPlayResult(
         winner=int(winner),
         samples=samples,
-        tree_reuse_count=player.mcts.root_reuse_count,
-        tree_reset_count=player.mcts.root_reset_count,
+        tree_reuse_count=search_engine.root_reuse_count,
+        tree_reset_count=search_engine.root_reset_count,
+        search_algorithm=self_play_config.search_algorithm,
+        simulations=len(samples) * self_play_config.simulations_per_move,
         elapsed_seconds=perf_counter() - started,
     )
 

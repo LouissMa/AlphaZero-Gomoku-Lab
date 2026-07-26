@@ -1,0 +1,44 @@
+[board]
+width = 3
+height = 3
+n_in_row = 3
+
+[network]
+channels = 8
+residual_blocks = 1
+policy_channels = 1
+value_channels = 1
+value_hidden_size = 16
+device = "cpu"
+amp = false
+compile_model = false
+
+[self_play]
+games_per_iteration = 2
+simulations_per_move = 4
+c_puct = 1.5
+search_algorithm = "gumbel"
+max_considered_actions = 3
+gumbel_scale = 1.0
+q_value_scale = 0.1
+q_visit_offset = 10.0
+temperature = 1.0
+parallel_games = 2
+inference_batch_size = 4
+inference_wait_ms = 10.0
+
+[optimization]
+learning_rate = 0.001
+weight_decay = 0.0
+batch_size = 2
+epochs_per_iteration = 1
+replay_capacity = 128
+gradient_clip_norm = 5.0
+
+[run]
+name = "gomoku-gumbel-smoke"
+seed = 2026
+deterministic = true
+iterations = 2
+checkpoint_every = 1
+output_dir = "runs"

@@ -15,6 +15,11 @@ dependencies = ["numpy>=1.26", "tomli>=2.0; python_version < '3.11'"]
 [project.optional-dependencies]
 gui = ["pygame>=2.5"]
 train = ["torch>=2.5"]
+web = [
+    "fastapi>=0.116",
+    "uvicorn>=0.35",
+    "httpx>=0.28",
+]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
@@ -26,6 +31,9 @@ gomoku = "alphazero_gomoku.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["alphazero_gomoku*"]
+
+[tool.setuptools.package-data]
+"alphazero_gomoku.web" = ["static/*"]
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers --strict-config"

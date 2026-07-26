@@ -1,0 +1,72 @@
+{
+  "config": {
+    "board": {
+      "height": 3,
+      "n_in_row": 3,
+      "width": 3
+    },
+    "c_puct": 1.5,
+    "confidence": 0.95,
+    "device": "cpu",
+    "games": 2,
+    "gumbel_scale": 1.0,
+    "max_considered_actions": 3,
+    "q_value_scale": 0.1,
+    "q_visit_offset": 10.0,
+    "seed": 2026,
+    "simulations_per_move": 4
+  },
+  "format_version": 1,
+  "match": {
+    "games": [
+      {
+        "candidate_player": 1,
+        "elapsed_seconds": 0.025164599999698112,
+        "first_player": "gumbel",
+        "index": 0,
+        "moves": 7,
+        "result": "win",
+        "seed": 3300764713747675561,
+        "winner": "gumbel"
+      },
+      {
+        "candidate_player": 2,
+        "elapsed_seconds": 0.023386399999253626,
+        "first_player": "puct",
+        "index": 1,
+        "moves": 7,
+        "result": "loss",
+        "seed": 11804314397344746686,
+        "winner": "puct"
+      }
+    ],
+    "opponent": "puct",
+    "summary": {
+      "confidence": 0.95,
+      "confidence_high": 0.9054687942657693,
+      "confidence_low": 0.09453120573423074,
+      "draws": 0,
+      "elo_difference": 0.0,
+      "games": 2,
+      "losses": 1,
+      "score": 0.5,
+      "wins": 1
+    }
+  },
+  "model": "runs\\gomoku-gumbel-smoke\\checkpoints\\step_000001\\model.pt",
+  "profiles": {
+    "gumbel": {
+      "elapsed_seconds": 0.003204399999958696,
+      "policy_entropy": 2.121844103592002,
+      "selected_action": 7,
+      "simulations_per_move": 4
+    },
+    "puct": {
+      "elapsed_seconds": 0.0028693000003841007,
+      "policy_entropy": 1.0986122886681096,
+      "selected_action": 1,
+      "simulations_per_move": 4
+    }
+  },
+  "timestamp": "2026-07-18T02:22:43.313999+00:00"
+}

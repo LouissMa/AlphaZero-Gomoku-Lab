@@ -45,10 +45,15 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 6. Gumbel AlphaZero
 
+**Status: complete.**
+
 - Sequential-halving root search and completed-Q-value policy targets.
 - Fair comparisons with PUCT at equal simulation budgets.
+- Configurable self-play, deterministic seeds, CLI benchmark, and versioned JSON evidence.
 
 ## 7. Interactive web application
+
+**Status: complete.**
 
 - Browser play, model selection, policy heatmaps, value estimates, and game replay.
 - A small inference API with containerized local deployment.
