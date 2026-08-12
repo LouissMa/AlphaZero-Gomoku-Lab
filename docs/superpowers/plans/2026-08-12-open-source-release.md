@@ -311,7 +311,7 @@ to ensure only intended phase files changed. If Docker is installed, run a local
 image build; otherwise rely on the required GitHub container check and report
 that limitation explicitly.
 
-- [ ] **Step 6: Commit, push, and open the final draft pull request**
+- [x] **Step 6: Commit, push, and open the final draft pull request**
 
 Commit implementation as `Prepare 1.0.0 open-source release`, push
 `codex/open-source-release`, and create a draft PR targeting `main`. The PR body
