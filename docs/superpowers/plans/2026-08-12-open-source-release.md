@@ -47,7 +47,7 @@
 - Produces: CLI command `gomoku release-check [--root PATH] [--tag TAG]`.
 - Consumes: repository metadata and documentation only; it performs no writes.
 
-- [ ] **Step 1: Write failing audit tests**
+- [x] **Step 1: Write failing audit tests**
 
 Create tests that use a temporary repository fixture and independently assert:
 
@@ -76,13 +76,13 @@ def test_validate_tag_matches_version() -> None:
     ]
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `python -m pytest tests/test_release.py -q`
 
 Expected: collection fails because `alphazero_gomoku.release` does not exist.
 
-- [ ] **Step 3: Implement the minimum auditor**
+- [x] **Step 3: Implement the minimum auditor**
 
 Use `Path`, `re`, and `tomllib` with the Python 3.10 `tomli` fallback. Define
 the exact required-file tuple from the design, read project version from
@@ -90,7 +90,7 @@ the exact required-file tuple from the design, read project version from
 `benchmarks/` and `reports/`, and return all violations in sorted order. Do not
 invoke Git, access the network, or mutate the repository.
 
-- [ ] **Step 4: Verify GREEN and add CLI behavior tests**
+- [x] **Step 4: Verify GREEN and add CLI behavior tests**
 
 Add tests calling `main(["release-check", "--root", str(path)])`. A valid fixture
 must return `0` and print `Release readiness check passed for 1.0.0.`; an invalid
@@ -100,12 +100,12 @@ Run: `python -m pytest tests/test_release.py -q`
 
 Expected: all focused tests pass.
 
-- [ ] **Step 5: Refactor version ownership**
+- [x] **Step 5: Refactor version ownership**
 
 Import `alphazero_gomoku.__version__` in `cli.py` rather than maintaining an
 independent literal. Preserve the public `VERSION` name for compatibility.
 
-- [ ] **Step 6: Run focused verification**
+- [x] **Step 6: Run focused verification**
 
 Run: `python -m pytest tests/test_release.py -q`
 
@@ -125,7 +125,7 @@ Expected: PASS with no warnings.
 - Consumes: `audit_repository` checks from Task 1.
 - Produces: consistent `1.0.0` metadata and complete indexes for tracked evidence.
 
-- [ ] **Step 1: Record model integrity metadata**
+- [x] **Step 1: Record model integrity metadata**
 
 Run:
 
@@ -138,14 +138,14 @@ Document the exact filenames and hashes. Identify `best_policy_6_6_4.*` as
 legacy NumPy weights are intended for demonstrations and regression checks,
 not as modern benchmark claims.
 
-- [ ] **Step 2: Update versions and lifecycle metadata**
+- [x] **Step 2: Update versions and lifecycle metadata**
 
 Set both `pyproject.toml` and `alphazero_gomoku/__init__.py` to `1.0.0`. Add a
 Keep a Changelog `1.0.0` section dated `2026-08-12`, and a valid `CITATION.cff`
 with `cff-version: 1.2.0`, project title, version, release date, repository URL,
 MIT license, and the repository owner as author.
 
-- [ ] **Step 3: Expand the benchmark evidence index**
+- [x] **Step 3: Expand the benchmark evidence index**
 
 List and explain:
 
@@ -182,20 +182,20 @@ violations; model, benchmark, changelog, citation, and version violations are ab
 - Consumes: actual CLI commands, docs, reports, and optional dependencies.
 - Produces: equivalent English/Chinese navigation and structured contribution paths.
 
-- [ ] **Step 1: Rewrite the English landing page as a release page**
+- [x] **Step 1: Rewrite the English landing page as a release page**
 
 Keep the existing capability detail but add a Chinese-language link, `1.0.0`
 release badge, web/Docker quick start, architecture/research workflow, evidence
 table, model-card link, limitations, release status, community links, and
 citation. Every command must be copied from a working CLI parser path.
 
-- [ ] **Step 2: Create the Simplified Chinese landing page**
+- [x] **Step 2: Create the Simplified Chinese landing page**
 
 Mirror the same facts and navigation, link back to English at the top, and use
 natural Chinese explanations rather than a sentence-by-sentence mechanical
 translation. Preserve commands unchanged.
 
-- [ ] **Step 3: Add community policies and forms**
+- [x] **Step 3: Add community policies and forms**
 
 Use Contributor Covenant 2.1 text for `CODE_OF_CONDUCT.md`, private security
 reporting through GitHub Security Advisories in `SECURITY.md`, GitHub Discussions
@@ -203,12 +203,12 @@ or Issues guidance in `SUPPORT.md`, required reproduction/environment fields in
 the bug form, measurable acceptance criteria in the feature form, and test/docs/
 benchmark checkboxes in the PR template.
 
-- [ ] **Step 4: Synchronize contribution commands**
+- [x] **Step 4: Synchronize contribution commands**
 
 Install `.[dev,train,web]`, run the full pytest suite, maintained-tree Ruff
 command, `gomoku release-check`, and document benchmark/model metadata duties.
 
-- [ ] **Step 5: Run documentation cross-reference checks**
+- [x] **Step 5: Run documentation cross-reference checks**
 
 Run: `python -m pytest tests/test_release.py -q`
 
@@ -228,20 +228,20 @@ may remain until Tasks 4 and 5.
 - Consumes: `gomoku release-check`, `pyproject.toml`, Dockerfile, and Git tag.
 - Produces: PR image build validation and tag-only Python/GHCR/GitHub artifacts.
 
-- [ ] **Step 1: Add pull-request container validation**
+- [x] **Step 1: Add pull-request container validation**
 
 Use `docker/setup-buildx-action` and `docker/build-push-action` with `push: false`,
 GitHub Actions cache, and paths covering the Dockerfile, package, models, web
 assets, and package metadata. Grant only `contents: read`.
 
-- [ ] **Step 2: Add the artifact validation job**
+- [x] **Step 2: Add the artifact validation job**
 
 The release workflow triggers on `v*.*.*` tags and `workflow_dispatch`. Its
 validation job checks version/tag equality for tag events, runs release audit,
 pytest and Ruff, builds with `python -m build`, installs the wheel into a fresh
 virtual environment, runs `doctor`, generates `SHA256SUMS`, and uploads `dist/`.
 
-- [ ] **Step 3: Add tag-only publication jobs**
+- [x] **Step 3: Add tag-only publication jobs**
 
 For tag events only, authenticate to GHCR with `GITHUB_TOKEN`, generate OCI
 metadata, push `linux/amd64,linux/arm64`, attach version and `latest` tags, then
@@ -249,12 +249,12 @@ create the GitHub Release from validated artifacts with generated notes. Use
 job-level `packages: write` or `contents: write`; do not grant these permissions
 to validation jobs.
 
-- [ ] **Step 4: Add release audit to normal CI**
+- [x] **Step 4: Add release audit to normal CI**
 
 Run `python -m alphazero_gomoku release-check` after tests so repository drift
 fails pull requests before release day.
 
-- [ ] **Step 5: Document the operator sequence**
+- [x] **Step 5: Document the operator sequence**
 
 `docs/RELEASING.md` requires a clean `main`, green CI, local audit/build/wheel
 smoke test, annotated `v1.0.0` tag, push, Actions monitoring, and post-release
@@ -272,38 +272,38 @@ does not create the tag.
 - Consumes: all prior task outputs.
 - Produces: a clean, verified release-candidate commit and PR to `main`.
 
-- [ ] **Step 1: Mark milestone 8 complete**
+- [x] **Step 1: Mark milestone 8 complete**
 
 Add `**Status: complete.**` to roadmap phase 8, check the final README roadmap
 item, and record release-audit, bilingual docs, model cards, CI/container, and
 tag automation in `progress.md`.
 
-- [ ] **Step 2: Run the complete repository audit**
+- [x] **Step 2: Run the complete repository audit**
 
 Run: `python -m alphazero_gomoku release-check`
 
 Expected: `Release readiness check passed for 1.0.0.` and exit code `0`.
 
-- [ ] **Step 3: Run all Python checks**
+- [x] **Step 3: Run all Python checks**
 
 Run:
 
 ```powershell
 python -m pytest
-ruff check alphazero_gomoku tests
+ruff check alphazero_gomoku/cli.py alphazero_gomoku/release.py alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/gumbel alphazero_gomoku/web tests
 python -m alphazero_gomoku doctor
 ```
 
 Expected: all tests pass, Ruff exits zero, and doctor reports version `1.0.0`.
 
-- [ ] **Step 4: Build and smoke-test distribution artifacts**
+- [x] **Step 4: Build and smoke-test distribution artifacts**
 
 Run `python -m build`. Create an isolated temporary virtual environment, install
 the generated wheel with its dependencies, and run both `python -m
 alphazero_gomoku doctor` and `python -m alphazero_gomoku release-check --root
 <repository-root>`. Expected: both commands exit zero.
 
-- [ ] **Step 5: Validate declarative artifacts**
+- [x] **Step 5: Validate declarative artifacts**
 
 Parse every `.github/**/*.yml` and `CITATION.cff` with a YAML parser available in
 the development environment, run `git diff --check`, and inspect `git status`

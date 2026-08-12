@@ -1,11 +1,21 @@
 # AlphaZero Gomoku Lab
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 [![CI](https://github.com/LouissMa/AlphaZero-Gomoku-Lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LouissMa/AlphaZero-Gomoku-Lab/actions/workflows/ci.yml)
 [![PyTorch backend](https://github.com/LouissMa/AlphaZero-Gomoku-Lab/actions/workflows/pytorch.yml/badge.svg)](https://github.com/LouissMa/AlphaZero-Gomoku-Lab/actions/workflows/pytorch.yml)
+[![Container](https://github.com/LouissMa/AlphaZero-Gomoku-Lab/actions/workflows/container.yml/badge.svg)](https://github.com/LouissMa/AlphaZero-Gomoku-Lab/actions/workflows/container.yml)
+[![Release](https://img.shields.io/badge/release-1.0.0-7c3aed)](CHANGELOG.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0f766e.svg)](LICENSE)
 
 A modern, reproducible AlphaZero self-play research and engineering lab for
 Gomoku. The project is upgraded through independently testable milestones while
 preserving the bundled NumPy inference path and pretrained models.
+
+The repository is both a research workbench and an engineering portfolio:
+experiments are reproducible, search improvements are compared at matched
+budgets, release evidence is machine-readable, and the complete browser demo
+runs locally without a cloud service.
 
 ## Current capabilities
 
@@ -45,6 +55,36 @@ For terminal play:
 ```bash
 python human_play.py
 ```
+
+For the interactive browser application:
+
+```bash
+python -m pip install -e ".[web]"
+gomoku serve
+```
+
+Or run the same non-root service in Docker:
+
+```bash
+docker build -t alphazero-gomoku-lab:1.0.0 .
+docker run --rm -p 8000:8000 alphazero-gomoku-lab:1.0.0
+```
+
+Open `http://127.0.0.1:8000` and use `/api/health` for a deployment health
+check.
+
+## Research workflow
+
+```text
+typed experiment config -> seeded self-play -> persistent replay
+                        -> optimization/checkpoint -> evaluation arena
+                        -> confidence-gated promotion -> web inference
+```
+
+The training snapshot stores network and optimizer state, replay data, random
+number generator states, configuration, and version metadata. The arena then
+alternates colors and reports confidence intervals instead of promoting a model
+from a single headline win rate.
 
 ## Modern PyTorch backend
 
@@ -129,6 +169,19 @@ gomoku compare-search \
 See the [Gumbel AlphaZero guide](docs/GUMBEL_ALPHAZERO.md) for the formulas,
 configuration, benchmark schema, and implementation scope.
 
+## Evidence and model transparency
+
+| Artifact | Purpose |
+| --- | --- |
+| [Bundled model card](models/README.md) | File inventory, SHA-256 hashes, intended use, provenance gaps, and limitations |
+| [Scalable self-play smoke report](benchmarks/smoke_cpu.json) | Batched inference, parallel actors, tree reuse, and hardware metadata |
+| [Gumbel vs PUCT smoke report](benchmarks/gumbel_vs_puct_smoke.json) | Equal simulation budget and deterministic comparison schema |
+| [Arena smoke report](reports/arena_smoke.json) | Alternating colors, baselines, confidence intervals, and Elo schema |
+
+These deliberately small reports prove execution paths and reproducibility
+metadata. They do not establish general playing strength or cross-hardware
+performance. See the [benchmark interpretation guide](benchmarks/README.md).
+
 ## Interactive web application
 
 Launch the portfolio-ready browser experience:
@@ -152,6 +205,12 @@ ruff check alphazero_gomoku/cli.py alphazero_gomoku/policy_value_net_pytorch.py 
 
 See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 
+Before proposing a release, run the executable repository audit:
+
+```bash
+gomoku release-check
+```
+
 ## Roadmap
 
 - [x] Modern engineering baseline.
@@ -161,7 +220,31 @@ See the [roadmap](docs/ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 - [x] Elo evaluation arena.
 - [x] Gumbel AlphaZero.
 - [x] Interactive web application.
-- [ ] Containerized open-source release and benchmark report.
+- [x] Containerized open-source release and benchmark report.
+
+## Limitations
+
+- The bundled NumPy weights predate the reproducible training pipeline; exact
+  seeds, replay data, hardware, and controlled strength measurements are not
+  available.
+- Committed benchmarks are smoke workloads, not leaderboard results.
+- Training a competitive network remains compute-intensive and is not performed
+  by the default test suite.
+- The engine demonstrates freestyle Gomoku and does not implement every
+  tournament rule variant.
+
+## Community and releases
+
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+- Use the structured GitHub issue forms for reproducible bugs and scoped ideas.
+- Report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
+- See [SUPPORT.md](SUPPORT.md), the [changelog](CHANGELOG.md), and the
+  [release runbook](docs/RELEASING.md) for lifecycle details.
+
+## Citation
+
+Citation metadata is available in [`CITATION.cff`](CITATION.cff). GitHub can
+render it through **Cite this repository** after the release lands on `main`.
 
 ## Project origin
 

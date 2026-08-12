@@ -60,4 +60,6 @@ must leave the main branch runnable and include measurable acceptance criteria.
 
 ## 8. Open-source release
 
+**Status: complete.**
+
 - CI, Docker images, model cards, benchmark reports, bilingual documentation, and releases.
