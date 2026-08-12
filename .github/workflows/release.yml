@@ -1,0 +1,147 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate Python artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install build and test dependencies
+        run: python -m pip install --upgrade pip build ".[dev,train,web]"
+
+      - name: Audit release metadata
+        if: github.event_name == 'workflow_dispatch'
+        run: python -m alphazero_gomoku release-check
+
+      - name: Validate tag and release metadata
+        if: github.event_name == 'push'
+        run: python -m alphazero_gomoku release-check --tag "$GITHUB_REF_NAME"
+
+      - name: Run tests and lint
+        run: |
+          python -m pytest
+          ruff check alphazero_gomoku/cli.py alphazero_gomoku/release.py alphazero_gomoku/policy_value_net_pytorch.py alphazero_gomoku/training alphazero_gomoku/evaluation alphazero_gomoku/gumbel alphazero_gomoku/web tests
+
+      - name: Build wheel and source distribution
+        run: python -m build
+
+      - name: Smoke-test installed wheel
+        run: |
+          python -m venv /tmp/alphazero-release
+          /tmp/alphazero-release/bin/python -m pip install --upgrade pip
+          /tmp/alphazero-release/bin/python -m pip install dist/*.whl
+          /tmp/alphazero-release/bin/python -m alphazero_gomoku doctor
+          /tmp/alphazero-release/bin/python -m alphazero_gomoku release-check --root "$GITHUB_WORKSPACE"
+
+      - name: Generate checksums
+        run: cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS
+
+      - name: Upload validated distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-distributions
+          path: dist/
+          if-no-files-found: error
+
+  publish-container:
+    name: Publish multi-platform GHCR image
+    if: github.event_name == 'push'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest
+
+      - name: Build and publish image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish-release:
+    name: Publish GitHub Release
+    if: github.event_name == 'push'
+    needs: [validate, publish-container]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild release artifacts from the tagged commit
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+          cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS

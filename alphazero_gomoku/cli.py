@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import platform
+import sys
 from collections.abc import Sequence
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -12,7 +13,9 @@ from typing import Any
 
 import numpy as np
 
-VERSION = "0.1.0"
+from alphazero_gomoku import __version__
+
+VERSION = __version__
 
 
 def _default_model_path() -> Path:
@@ -215,6 +218,40 @@ def _compare_search(args: argparse.Namespace) -> int:
     return 0
 
 
+def _serve(args: argparse.Namespace) -> int:
+    try:
+        import uvicorn
+    except ImportError as error:
+        raise SystemExit(
+            'Web dependencies are required. Install them with: pip install -e ".[web]"'
+        ) from error
+    target: object
+    if args.reload:
+        target = "alphazero_gomoku.web.api:app"
+    else:
+        from alphazero_gomoku.web.api import create_app
+
+        target = create_app()
+    uvicorn.run(target, host=args.host, port=args.port, reload=args.reload)
+    return 0
+
+
+def _release_check(args: argparse.Namespace) -> int:
+    from alphazero_gomoku.release import audit_repository, project_version, validate_tag
+
+    problems = audit_repository(args.root)
+    version = project_version(args.root)
+    if args.tag is not None and version is not None:
+        problems.extend(validate_tag(version, args.tag))
+    if problems:
+        print("Release readiness check failed:", file=sys.stderr)
+        for problem in sorted(set(problems)):
+            print(f"- {problem}", file=sys.stderr)
+        return 1
+    print(f"Release readiness check passed for {version}.")
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gomoku",
@@ -302,6 +339,21 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
     )
     comparison.set_defaults(handler=_compare_search)
+    server = subparsers.add_parser(
+        "serve",
+        help="Run the interactive AlphaZero Gomoku web application.",
+    )
+    server.add_argument("--host", default="127.0.0.1")
+    server.add_argument("--port", type=int, default=8000)
+    server.add_argument("--reload", action="store_true")
+    server.set_defaults(handler=_serve)
+    release_check = subparsers.add_parser(
+        "release-check",
+        help="Audit repository metadata and evidence before a release.",
+    )
+    release_check.add_argument("--root", type=Path, default=Path.cwd())
+    release_check.add_argument("--tag", help="Optional vMAJOR.MINOR.PATCH tag to validate.")
+    release_check.set_defaults(handler=_release_check)
     return parser
 
 

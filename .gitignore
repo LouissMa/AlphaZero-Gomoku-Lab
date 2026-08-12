@@ -14,3 +14,6 @@ models/best_policy.model
 models/current_policy.pt
 models/best_policy.pt
 runs/
+output/
+.playwright-cli/
+web-server.*.log

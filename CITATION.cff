@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "AlphaZero Gomoku Lab"
+type: software
+version: 1.0.0
+date-released: 2026-08-12
+authors:
+  - family-names: "LouissMa"
+repository-code: "https://github.com/LouissMa/AlphaZero-Gomoku-Lab"
+url: "https://github.com/LouissMa/AlphaZero-Gomoku-Lab"
+license: MIT
+keywords:
+  - AlphaZero
+  - Gomoku
+  - reinforcement learning
+  - Monte Carlo tree search
+  - Gumbel AlphaZero

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/LouissMa/AlphaZero-Gomoku-Lab/security/advisories/new
+    about: Report vulnerabilities privately instead of opening a public issue.
+  - name: Support guide
+    url: https://github.com/LouissMa/AlphaZero-Gomoku-Lab/blob/main/SUPPORT.md
+    about: Check setup guidance and the information needed for support questions.
